@@ -3,10 +3,12 @@ using Distances
 using Distributions
 using LinearAlgebra
 using Pathogen
+using Plots
 
 function testcovid(n)
-    n = 30_000
-    risks = DataFrame(x = rand(Uniform(0, 15), n), y = rand(Uniform(0, 30), n), riskfactor1 = rand(Gamma(), n))
+    n = 30
+    risks = DataFrame(x = rand(Uniform(0, 15), n), y = rand(Uniform(0, 30), n),
+        riskfactor1 = rand(Gamma(), n))
     
     # Precalculate Euclidean distances between individuals in a Population
     dists = [euclidean([risks[i, :x];
@@ -42,15 +44,17 @@ function testcovid(n)
     starting_states = append!([State_I], fill(State_S, n-1))
     sim = Simulation(pop, starting_states, rf, rparams)
     simulate!(sim, tmax=200.0)
-
-    p1 = plot(sim.events)
-    p2 = plot(sim.transmission_network, sim.population, sim.events, 0.0, title="Time = 0")
-    p6 = plot(sim.transmission_network, sim.population, sim.events, 100.0, title="Time = 200")
-    
+    plots = Vector{Plots.Plot}()
+    push!(plots, plot(sim.events))
+    for t in 0:50:200
+        push!(plots, plot(sim.transmission_network, sim.population, sim.events, 
+                          Float64(t), title="Time = $t"))
+    end 
     
     l = @layout [a; b c d e f]
-    plot(p1, p2, p3, p4, p5, p6, layout=l)
-    
+    plot(plots[1], plots[2], plots[3], plots[4], plots[5], plots[6], layout=l)
+println("hit key:")
+readline()
     obs = observe(sim, Uniform(0.5, 2.5), Uniform(0.5, 2.5), force=true)
     rpriors = RiskPriors{SIR}([Exponential(0.0001)], UnivariateDistribution[],
         [Uniform(1.0, 7.0)], UnivariateDistribution[], [Uniform(0.0, 1.0)])
@@ -85,8 +89,4 @@ function testcovid(n)
     println("\nTracesummary:\n", tracesummary)
 end
 
-testcovid(30_000) # Kauai
-
-testcovid(200_000) # Big Island
-
-
+testcovid(30_000)
