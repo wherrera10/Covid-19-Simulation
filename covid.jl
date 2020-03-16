@@ -6,8 +6,7 @@ using Pathogen
 
 function testcovid(n)
     n = 30_000
-    risks = DataFrame(x = rand(Uniform(0, 15), n), y = rand(Uniform(0, 30), n))
-    riskfactor1 = rand(Gamma(), n)
+    risks = DataFrame(x = rand(Uniform(0, 15), n), y = rand(Uniform(0, 30), n), riskfactor1 = rand(Gamma(), n))
     
     # Precalculate Euclidean distances between individuals in a Population
     dists = [euclidean([risks[i, :x];
