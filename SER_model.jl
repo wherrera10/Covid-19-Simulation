@@ -1,6 +1,6 @@
 
 # Hawaii County 2019
-const μBI = (1480 / 200,983) / 365
+const μBI = (1480 / 200_983) / 365
 
 const sigma, gamma = 0.25, 0.15
 
